@@ -1,4 +1,4 @@
-This demo uses OS guest policy and cloud workflows to execute a one time command (creates a dummy.txt in C:\) on a running GCE Windows instance.
+This demo uses OS guest policy and cloud workflows to execute a one time operation on a running GCE instance.
 
 ## Usage Instructions
 
