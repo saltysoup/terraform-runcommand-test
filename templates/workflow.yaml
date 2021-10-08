@@ -1,0 +1,157 @@
+main:
+  params: []
+  steps:
+  - init:
+      assign:
+        - project: '$${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}'
+        - zone: '${zone}'
+        - query_params1: '?osPolicyAssignmentId='
+        - query_params1_val: 'runcommand'
+        - osconfig_base_url: '$${string("https://osconfig.googleapis.com/v1alpha/")}'
+        - set_policy_url: '$${osconfig_base_url + "projects/" + project + "/locations/" + zone + "/osPolicyAssignments"}'
+
+  - set_policy:
+      try:
+        steps:
+          - set_policy_new:
+              call: http.post
+              args:
+                url: '$${set_policy_url + query_params1 + query_params1_val}'
+                auth:
+                  type: OAuth2
+                body:
+                  {
+                    "osPolicies": [
+                      {
+                        "id": "runcommand-id",
+                        "mode": "VALIDATION",
+                        "resourceGroups": [
+                          {
+                            "resources": [
+                              {
+                                "id": "create-new-file",
+                                "exec": {
+                                  "validate": {
+                                    "interpreter": "POWERSHELL",
+                                    "script": "New-Item 'C:\\dummy.txt'; exit 100"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "rollout": {
+                      "disruptionBudget": {
+                        "fixed": 1
+                      },
+                      "minWaitDuration": "1s"
+                    },
+                    "instanceFilter": {
+                      "inclusionLabels": [
+                        {
+                          "labels": {
+                            "${label_key}": "${label_value}"
+                          }
+                        }
+                      ]
+                    }
+                  }
+              result: set_policy_result
+          - log_set_policy_new:
+              call: sys.log
+              args:
+                text: '$${set_policy_result}'
+                severity: INFO
+      retry:
+        predicate: $${custom_predicate}
+        max_retries: 5
+        backoff:
+          initial_delay: 10
+          max_delay: 30
+          multiplier: 2
+
+  - get_policy_url: #extracting revisionId from response for projects.locations.osPolicyAssignments.get method
+        steps:
+          - set_url_path:
+              call: text.replace_all
+              args:
+                source: '$${set_policy_result.body.name}'
+                substr: '/operations/'
+                repl: '@'
+              result: policy_url 
+          - set_new_url_path:
+              assign:
+                - new_policy_url: '$${osconfig_base_url + policy_url}'
+          - log_set_url_path:
+              call: sys.log
+              args:
+                text: '$${"new url path for getting policy: " + new_policy_url}'
+                severity: INFO
+
+  - get_policy:
+      try:
+        steps:
+          - get_policy_status:
+              call: http.get
+              args:
+                url: '$${new_policy_url}'
+                auth:
+                  type: OAuth2
+              result: get_policy_result
+          - get_policy_status_code:
+              assign:
+                - policy_status_code: '$${get_policy_result.code}'
+          - backoff_retry_if_policy_not_set:
+              switch:
+                - condition: $${policy_status_code != 200}
+                  raise: '$${"Received HTTP response for getting policy: " + string(policy_status_code)}'
+      retry:
+        predicate: $${custom_predicate}
+        max_retries: 5
+        backoff:
+          initial_delay: 10
+          max_delay: 30
+          multiplier: 2
+
+  - delete_policy_cleanup:
+      try:
+        steps:
+          - log_delete_policy_url:
+              call: sys.log
+              args:
+                text: '$${"URL to delete policy: " + set_policy_url + "/" + query_params1_val}'
+          - delete_policy:
+              call: http.delete
+              args:
+                url: '$${set_policy_url + "/" + query_params1_val}'
+                auth:
+                  type: OAuth2
+              result: delete_policy_result
+          - log_delete_policy_response:
+              call: sys.log
+              args:
+                text: '$${delete_policy_result}'
+                severity: INFO
+      retry:
+        predicate: $${custom_predicate}
+        max_retries: 5
+        backoff:
+          initial_delay: 10
+          max_delay: 30
+          multiplier: 2
+
+custom_predicate:
+    params: [response]
+    steps:
+      - log_condition:
+          call: sys.log
+          args:
+            text: '$${"Want 200. Got: " + string(response.code)}'
+      - condition_to_retry:
+          switch:
+          - condition: '$${response.code != 200}'
+            return: True # keep retrying
+      - otherwise:
+          return: False # abort
