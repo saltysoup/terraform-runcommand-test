@@ -12,6 +12,7 @@ This demo uses OS guest policy and cloud workflows to execute a one time operati
   * Creation of a new temporary OS policy to run the inline powershell command within `templates/workflow.yaml`
   * Execution of powershell command to generate a dummy.txt file in C:\
   * Deletion of the temporary OS policy for clean up
+9. (Optional) To integration this capability with existing workflows, invoke the cloud workflows execution API as the hook for triggering in-guest scripts/commmands
 
 Note: This should also work for Linux instances by editing the inline interpreter from `powershell` to `shell` in `templates/workflow.yaml`. See [API documentation](https://cloud.google.com/compute/docs/osconfig/rest/v1alpha/projects.locations.osPolicyAssignments/create)
 
