@@ -62,13 +62,13 @@ main:
           - log_set_policy_new:
               call: sys.log
               args:
-                text: '$${"Created a new OS guest policy to run in-guest script. API Response: " + set_policy_result}'
+                text: '$${set_policy_result}'
                 severity: INFO
       retry:
         predicate: $${custom_predicate}
         max_retries: 5
         backoff:
-          initial_delay: 10
+          initial_delay: 30
           max_delay: 30
           multiplier: 2
 
@@ -132,7 +132,7 @@ main:
           - log_delete_policy_response:
               call: sys.log
               args:
-                text: '$${"Successfully deleted OS guest policy. API Response code: " + delete_policy_result}'
+                text: '$${"Successfully deleted OS guest policy. API Response: " + delete_policy_result}'
                 severity: INFO
       retry:
         predicate: $${custom_predicate}
