@@ -134,12 +134,12 @@ main:
               args:
                 text: '$${"Successfully deleted OS guest policy. API Response: " + string(delete_policy_result)}'
                 severity: INFO
-      retry:
+      retry: # Guest policy takes few min to finish deploying, so expect some retries
         predicate: $${custom_predicate}
-        max_retries: 5
+        max_retries: 10
         backoff:
-          initial_delay: 300 # Guest policy takes few min to finish deploying
-          max_delay: 60
+          initial_delay: 60 # max value 60
+          max_delay: 500 
           multiplier: 2
 
 custom_predicate:
