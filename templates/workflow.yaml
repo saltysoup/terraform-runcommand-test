@@ -87,7 +87,7 @@ main:
           - log_set_url_path:
               call: sys.log
               args:
-                text: '$${"This is the url path for the created OS guest policy: " + new_policy_url}'
+                text: '$${new_policy_url}'
                 severity: INFO
 
   - get_policy:
@@ -132,7 +132,7 @@ main:
           - log_delete_policy_response:
               call: sys.log
               args:
-                text: '$${"Successfully deleted OS guest policy. API Response: " + delete_policy_result}'
+                text: '$${delete_policy_result}'
                 severity: INFO
       retry:
         predicate: $${custom_predicate}
@@ -143,15 +143,15 @@ main:
           multiplier: 2
 
 custom_predicate:
-    params: [response]
+    params: [e]
     steps:
       - log_condition:
           call: sys.log
           args:
-            text: '$${"Expecting HTTP response code: 200. Received HTTP response: " + string(response.code)}'
+            text: '$${"Expecting HTTP response code: 200. Received HTTP response: " + string(e.code)}'
       - condition_to_retry:
           switch:
-          - condition: '$${response.code != 200}'
+          - condition: '$${e.code != 200}'
             return: True # keep retrying
       - otherwise:
           return: False # abort
