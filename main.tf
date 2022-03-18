@@ -42,7 +42,9 @@ module "service_accounts" {
   prefix     = random_pet.name.id
   names      = ["${var.workflows_service_account}"]
   project_roles = [
-    "${var.project_id}=>roles/osconfig.osPolicyAssignmentAdmin"
+    "${var.project_id}=>roles/osconfig.osPolicyAssignmentAdmin",
+    "${var.project_id}=>roles/logging.logWriter",
+    "${var.project_id}=>roles/iam.serviceAccountTokenCreator"
   ]
 }
 

@@ -33,7 +33,7 @@ variable "instance_labels" {
   type        = map
   description = "One or more Key Value pairs of instance label to target in map format eg. {\"environment\" = \"dev\"}"
   default = {
-    "environment" = "dev"
+    "env" = "test"
   }
 }
 
