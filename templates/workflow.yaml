@@ -87,7 +87,7 @@ main:
           - log_set_url_path:
               call: sys.log
               args:
-                text: '$${new_policy_url}'
+                text: '$${"This is the url path for the created OS guest policy: " + str(new_policy_url)}'
                 severity: INFO
 
   - get_policy:
@@ -132,7 +132,7 @@ main:
           - log_delete_policy_response:
               call: sys.log
               args:
-                text: '$${delete_policy_result}'
+                text: '$${"Successfully deleted OS guest policy. API Response: " + str(delete_policy_result)}'
                 severity: INFO
       retry:
         predicate: $${custom_predicate}
