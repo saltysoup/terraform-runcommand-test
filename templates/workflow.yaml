@@ -62,7 +62,7 @@ main:
           - log_set_policy_new:
               call: sys.log
               args:
-                text: '$${set_policy_result}'
+                text: '$${"Created a new OS guest policy to run in-guest script. API Response: " + set_policy_result}'
                 severity: INFO
       retry:
         predicate: $${custom_predicate}
@@ -87,7 +87,7 @@ main:
           - log_set_url_path:
               call: sys.log
               args:
-                text: '$${"new url path for getting policy: " + new_policy_url}'
+                text: '$${"This is the url path for the created OS guest policy: " + new_policy_url}'
                 severity: INFO
 
   - get_policy:
@@ -106,12 +106,12 @@ main:
           - backoff_retry_if_policy_not_set:
               switch:
                 - condition: $${policy_status_code != 200}
-                  raise: '$${"Received HTTP response for getting policy: " + string(policy_status_code)}'
+                  raise: '$${"Waiting for OS guest policy to be deployed. Expecting HTTP Response 200. Received: " + string(policy_status_code)}'
       retry:
         predicate: $${custom_predicate}
         max_retries: 5
         backoff:
-          initial_delay: 10
+          initial_delay: 60
           max_delay: 30
           multiplier: 2
 
@@ -121,7 +121,7 @@ main:
           - log_delete_policy_url:
               call: sys.log
               args:
-                text: '$${"URL to delete policy: " + set_policy_url + "/" + query_params1_val}'
+                text: '$${"Deleting OS guest policy using path: " + set_policy_url + "/" + query_params1_val}'
           - delete_policy:
               call: http.delete
               args:
@@ -132,13 +132,13 @@ main:
           - log_delete_policy_response:
               call: sys.log
               args:
-                text: '$${delete_policy_result}'
+                text: '$${"Successfully deleted OS guest policy. API Response code: " + delete_policy_result}'
                 severity: INFO
       retry:
         predicate: $${custom_predicate}
         max_retries: 5
         backoff:
-          initial_delay: 10
+          initial_delay: 60
           max_delay: 30
           multiplier: 2
 
@@ -148,7 +148,7 @@ custom_predicate:
       - log_condition:
           call: sys.log
           args:
-            text: '$${"Want 200. Got: " + string(response.code)}'
+            text: '$${"Expecting HTTP response code: 200. Received HTTP response: " + string(response.code)}'
       - condition_to_retry:
           switch:
           - condition: '$${response.code != 200}'
