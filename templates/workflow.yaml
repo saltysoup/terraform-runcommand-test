@@ -44,7 +44,7 @@ main:
                     ],
                     "rollout": {
                       "disruptionBudget": {
-                        "fixed": 1
+                        "fixed": 1 # change to rollout to multiple VMs at once
                       },
                       "minWaitDuration": "1s"
                     },
@@ -138,7 +138,7 @@ main:
         predicate: $${custom_predicate}
         max_retries: 5
         backoff:
-          initial_delay: 60
+          initial_delay: 300 # Guest policy takes few min to finish deploying
           max_delay: 60
           multiplier: 2
 
