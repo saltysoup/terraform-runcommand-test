@@ -132,7 +132,7 @@ main:
           - log_delete_policy_response:
               call: sys.log
               args:
-                text: '$${"Successfully deleted OS guest policy. API Response: " + string(delete_policy_result)}'
+                text: '$${"Successfully deleted OS guest policy: " + delete_policy_result.body.name}'
                 severity: INFO
       retry: # Guest policy takes few min to finish deploying, so expect some retries
         predicate: $${custom_predicate}
