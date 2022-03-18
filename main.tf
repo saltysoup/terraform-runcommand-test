@@ -61,7 +61,7 @@ resource "google_workflows_workflow" "runcommand" {
   source_contents = templatefile("${path.module}/templates/workflow.yaml",
   {
     zone = var.zone,
-    
+    runcommand_name = "runcommand-${random_pet.name.id}"
     label_key = each.key
     label_value = each.value
     }
