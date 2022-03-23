@@ -33,7 +33,7 @@ main:
                                 "exec": {
                                   "validate": {
                                     "interpreter": "POWERSHELL",
-                                    "script": "New-Item 'C:\\ilovespam.txt'; exit 100"
+                                    "script": "New-Item 'C:\\ilovespam.txt'; exit 100" # your custom logic or code goes here
                                   }
                                 }
                               }
