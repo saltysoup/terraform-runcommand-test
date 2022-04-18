@@ -9,6 +9,7 @@ main:
         - query_params1_val: '${runcommand_name}'
         - osconfig_base_url: '$${string("https://osconfig.googleapis.com/v1alpha/")}'
         - set_policy_url: '$${osconfig_base_url + "projects/" + project + "/locations/" + zone + "/osPolicyAssignments"}'
+        - local_download_dir: 'C:\temp\' 
 
   - set_policy:
       try:
@@ -44,7 +45,7 @@ main:
                     ],
                     "rollout": {
                       "disruptionBudget": {
-                        "fixed": 1 # change to rollout to multiple VMs at once
+                        "percent": 100 # apply runcommand to all target instances. Customisable value https://cloud.google.com/compute/docs/osconfig/rest/v1/FixedOrPercent
                       },
                       "minWaitDuration": "1s"
                     },
@@ -112,6 +113,35 @@ main:
         max_retries: 5
         backoff:
           initial_delay: 60
+          max_delay: 60
+          multiplier: 2
+
+  - validate_policy:
+      try:
+        steps:
+          - log_validate_policy_url:
+              call: sys.log
+              args:
+                text: '$${"Validating successful deployment of OS guest policy using path: " + set_policy_url + "/" + query_params1_val}'
+          - validate_policy_status:
+              call: http.get
+              args:
+                url: '$${new_policy_url}'
+                auth:
+                  type: OAuth2
+              result: get_policy_result
+          - validate_policy_status_code:
+              assign:
+                - policy_status_code: '$${get_policy_result.code}'
+          - validate_backoff_retry_if_policy_not_set:
+              switch:
+                - condition: $${policy_status_code != 200}
+                  raise: '$${"Waiting to confirm successful rollout of OS guest policy. Expecting HTTP Response 200. Received: " + string(policy_status_code)}'
+      retry:
+        predicate: $${custom_predicate}
+        max_retries: 5
+        backoff:
+          initial_delay: 30
           max_delay: 60
           multiplier: 2
 
