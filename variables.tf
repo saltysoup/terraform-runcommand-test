@@ -29,6 +29,17 @@ variable "zone" {
   #default     = "australia-southeast1-b"
 }
 
+variable "remote_script_location" {
+  type        = string
+  description = "Path of remote powershell script to execute in VM eg. https://my-bucket/myScript.ps1"
+  default     = ""
+}
+
+variable "remote_script_sha256" {
+  type        = string
+  description = "SHA265 "
+}
+
 variable "instance_labels" {
   type        = map
   description = "One or more Key Value pairs of instance label to target in map format eg. {\"environment\" = \"dev\"}"

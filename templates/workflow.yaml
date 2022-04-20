@@ -9,7 +9,8 @@ main:
         - query_params1_val: '${runcommand_name}'
         - osconfig_base_url: '$${string("https://osconfig.googleapis.com/v1alpha/")}'
         - set_policy_url: '$${osconfig_base_url + "projects/" + project + "/locations/" + zone + "/osPolicyAssignments"}'
-        - local_download_dir: 'C:\temp\' 
+        - remote_script_location: '${runcommand_remote_script_gcs_location}'
+        - local_download_location: 'C:\temp\' 
 
   - set_policy:
       try:
@@ -30,11 +31,16 @@ main:
                           {
                             "resources": [
                               {
-                                "id": "create-new-file",
+                                "id": "invoke-remote-ps-script",
                                 "exec": {
                                   "validate": {
                                     "interpreter": "POWERSHELL",
-                                    "script": "New-Item 'C:\\ilovespam.txt'; exit 100" # your custom logic or code goes here
+                                    "file": {
+                                      "remote": {
+                                        "uri": "https://github.com/saltysoup/terraform-microsoft-on-gcp/raw/main/Active%20Directory/Managed%20AD/singlesignon/scripts/test.ps1", #test
+                                        "sha256Checksum": "0071F5C5481BF2450E3BD35FFA1E0ED10CA75AFDC8CFE142B09E8BF09882301C"
+                                      }
+                                    }
                                   }
                                 }
                               }
