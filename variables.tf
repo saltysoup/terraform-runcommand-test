@@ -32,12 +32,13 @@ variable "zone" {
 variable "remote_script_location" {
   type        = string
   description = "Path of remote powershell script to execute in VM eg. https://my-bucket/myScript.ps1"
-  default     = ""
+  default     = "https://github.com/saltysoup/terraform-microsoft-on-gcp/raw/main/Active%20Directory/Managed%20AD/singlesignon/scripts/test.ps1"
 }
 
-variable "remote_script_sha256" {
+variable "remote_script_sha256_checksum" {
   type        = string
-  description = "SHA265 "
+  description = "SHA265 checksum value of remote script"
+  default = "0071F5C5481BF2450E3BD35FFA1E0ED10CA75AFDC8CFE142B09E8BF09882301C"
 }
 
 variable "instance_labels" {
