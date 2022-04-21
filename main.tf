@@ -63,7 +63,7 @@ resource "google_workflows_workflow" "runcommand" {
       zone = var.zone
       remote_script_location = var.remote_script_location
       remote_script_sha256_checksum = var.remote_script_sha256_checksum
-      runcommand_name = "runcommand_${random_pet.name.id}"
+      runcommand_name = "runcommand-${random_pet.name.id}"
       label_key = each.key
       label_value = each.value
     }
