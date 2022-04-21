@@ -59,13 +59,13 @@ resource "google_workflows_workflow" "runcommand" {
   for_each = var.instance_labels
   # Imported main workflow YAML file
   source_contents = templatefile("${path.module}/templates/workflow.yaml",
-  {
-    zone = var.zone
-    runcommand_remote_script_location = var.remote_script_location
-    runcommand_remote_script_sha256_checksum = var.remote_script_sha256_checksum
-    runcommand_name = "runcommand_${random_pet.name.id}"
-    label_key = each.key
-    label_value = each.value
+    {
+      zone = var.zone
+      remote_script_location = var.remote_script_location
+      remote_script_sha256_checksum = var.remote_script_sha256_checksum
+      runcommand_name = "runcommand_${random_pet.name.id}"
+      label_key = each.key
+      label_value = each.value
     }
   )
 

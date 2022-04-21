@@ -5,12 +5,13 @@ main:
       assign:
         - project: '$${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}'
         - zone: '${zone}'
+        - remote_script_location: '${remote_script_location}'
+        - remote_script_sha256_checksum: '${remote_script_sha256_checksum}'
         - query_params1: '?osPolicyAssignmentId='
         - query_params1_val: '${runcommand_name}'
         - osconfig_base_url: '$${string("https://osconfig.googleapis.com/v1alpha/")}'
         - set_policy_url: '$${osconfig_base_url + "projects/" + project + "/locations/" + zone + "/osPolicyAssignments"}'
-        - remote_script_location: '${runcommand_remote_script_location}'
-        - remote_script_sha256_checksum: '${runcommand_remote_script_sha256_checksum}'
+        
 
   - set_policy:
       try:

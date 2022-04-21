@@ -21,12 +21,13 @@
 variable "project_id" {
   type        = string
   description = "Project ID for Cloud Workflows"
+  default     = "injae-sandbox-340804"
 }
 
 variable "zone" {
   type        = string
   description = "Zone where GCE instance is running eg. us-central1-b"
-  #default     = "australia-southeast1-b"
+  default     = "australia-southeast1-b"
 }
 
 variable "remote_script_location" {
